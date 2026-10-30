@@ -21,12 +21,12 @@
     "@google-cloud/storage": "^7.15.2",
     "@supabase/supabase-js": "^2.46.1",
     "adm-zip": "^0.5.16",
-    "form-data": "^4.0.0",
+    "form-data": "^4.0.6",
     "formidable": "^3.5.2",
     "framer-motion": "^11.11.17",
     "mime": "^2.5.2",
     "moment": "^2.30.1",
-    "next": "^15.2.6",
+    "next": "^15.5.28",
     "pg": "^8.13.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -53,10 +53,14 @@
     "jest": "^27.5.1",
     "node-mocks-http": "^1.10.1",
     "nullthrows": "^1.1.1",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.18",
     "prettier": "^2.6.2",
     "standard-version": "^9.5.0",
     "tailwindcss": "^3.4.15",
     "typescript": "^4.6.3"
+  },
+  "overrides": {
+    "fast-xml-parser@>=4.0.0 <4.5.5": "4.5.7",
+    "@xmldom/xmldom@>=0.7.0 <0.8.15": "0.8.15"
   }
 }
