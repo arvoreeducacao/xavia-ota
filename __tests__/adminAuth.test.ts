@@ -1,10 +1,7 @@
 import { NextApiHandler } from 'next';
-import { createMocks, RequestMethod } from 'node-mocks-http';
+import { Body, Cookies, createMocks, Headers, Query, RequestMethod } from 'node-mocks-http';
 
-import {
-  ADMIN_SESSION_COOKIE,
-  createAdminSessionToken,
-} from '../apiUtils/helpers/AdminAuthHelper';
+import { ADMIN_SESSION_COOKIE, createAdminSessionToken } from '../apiUtils/helpers/AdminAuthHelper';
 import { DatabaseFactory } from '../apiUtils/database/DatabaseFactory';
 import { StorageFactory } from '../apiUtils/storage/StorageFactory';
 import loginEndpoint from '../pages/api/login';
@@ -19,7 +16,15 @@ jest.mock('../apiUtils/storage/StorageFactory');
 
 const ADMIN_PASSWORD = 'test-admin-password';
 
-const adminRoutes: { name: string; handler: NextApiHandler; method: RequestMethod; query?: object; body?: object }[] = [
+interface AdminRoute {
+  name: string;
+  handler: NextApiHandler;
+  method: RequestMethod;
+  query?: Query;
+  body?: Body;
+}
+
+const adminRoutes: AdminRoute[] = [
   { name: 'GET /api/releases', handler: releasesHandler, method: 'GET' },
   {
     name: 'POST /api/rollback',
@@ -73,7 +78,7 @@ describe('Admin routes authentication', () => {
   });
 
   describe.each(adminRoutes)('$name', ({ handler, method, query, body }) => {
-    async function call(options: { headers?: object; cookies?: object } = {}) {
+    async function call(options: { headers?: Headers; cookies?: Cookies } = {}) {
       const backends = mockBackends();
       const { req, res } = createMocks({ method, query, body, ...options });
       await handler(req, res);
