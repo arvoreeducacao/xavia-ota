@@ -39,6 +39,7 @@ S3_SECRET_ACCESS_KEY=your-secret-access-key
 S3_BUCKET_NAME=your-s3-bucket-name
 ```
 - Support all S3 compatible storage (AWS S3, Digital Ocean Spaces, Cloudflare R2, etc.)
+- On AWS, leave `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` unset to use the SDK default credential chain (instance role, IRSA, SSO profile). Setting only one of them is an error.
 - Bucket should be created manually before starting the server
 
 ## Supported Database Providers
