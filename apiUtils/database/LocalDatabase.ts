@@ -1,19 +1,42 @@
-import { Pool } from 'pg';
+import { Signer } from '@aws-sdk/rds-signer';
+import { Pool, PoolConfig } from 'pg';
 
 import { DatabaseInterface, Release, Tracking, TrackingMetrics } from './DatabaseInterface';
 import { Tables } from './DatabaseFactory';
+
+function buildPoolConfig(): PoolConfig {
+  const host = process.env.POSTGRES_HOST;
+  const port = parseInt(process.env.POSTGRES_PORT ?? '5432', 10);
+  const user = process.env.POSTGRES_USER;
+  const connection = { user, host, port, database: process.env.POSTGRES_DB };
+
+  if (process.env.POSTGRES_AUTH !== 'iam') {
+    return { ...connection, password: process.env.POSTGRES_PASSWORD };
+  }
+
+  if (!host || !user) {
+    throw new Error('POSTGRES_HOST and POSTGRES_USER are required when POSTGRES_AUTH=iam');
+  }
+
+  const signer = new Signer({
+    hostname: host,
+    port,
+    username: user,
+    region: process.env.POSTGRES_REGION ?? process.env.AWS_REGION ?? 'us-east-1',
+  });
+
+  return {
+    ...connection,
+    password: () => signer.getAuthToken(),
+    ssl: { rejectUnauthorized: false },
+  };
+}
 
 export class PostgresDatabase implements DatabaseInterface {
   private pool: Pool;
 
   constructor() {
-    this.pool = new Pool({
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-    });
+    this.pool = new Pool(buildPoolConfig());
   }
   async getLatestReleaseRecordForRuntimeVersion(runtimeVersion: string): Promise<Release | null> {
     const query = `
